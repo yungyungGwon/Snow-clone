@@ -1,11 +1,17 @@
+import { userAgent } from "next/server"
+
 export const isMobile = () =>{
-    return 'ontouchstart' in globalThis.window
+    return 'ontouchstart' in globalThis.window || navigator.maxTouchPoints > 1
 }
 
 export const getDeviceType = () => {
-    console.log('dfdfdf', isMobile())
-    if(isMobile())
-    return
+    if(isMobile()) {
+        if(/(android)/i.test(navigator.userAgent))
+            return deviceType.Android
+
+        return deviceType.iOS
+    }
+    return deviceType.PC
 }
 
 export enum deviceType {

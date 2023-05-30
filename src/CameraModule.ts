@@ -1,3 +1,5 @@
+import { getDeviceType } from "./Common"
+
 export const CameraModule = () => {
 
     /**
@@ -10,6 +12,7 @@ export const CameraModule = () => {
     const getAvailableDeviceId = async() => {
         const cameraDevices = (await navigator.mediaDevices.enumerateDevices()).filter((mediaDevice) => mediaDevice.kind === 'videoinput')
 
+        getDeviceType()
         if(cameraDevices.length === 0)
             return Error;
 
