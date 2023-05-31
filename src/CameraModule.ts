@@ -1,21 +1,31 @@
-import { getDeviceType } from "./Common"
+import { deviceType, getDeviceType } from "./Common"
 
+/**
+ * Camera Module
+ * @returns getUserDevice()
+ */
 export const CameraModule = () => {
 
     /**
-     * Device Type
-     */
-
-    /**
-     * Get device ID only videoInput and back camera
+     * Get device ID 
+     * If access device is mobile, get videoInput and back camera
+     * If is not mobile device, get first index camera ID
      */
     const getAvailableDeviceId = async() => {
+        const accessDeviceType = getDeviceType()
         const cameraDevices = (await navigator.mediaDevices.enumerateDevices()).filter((mediaDevice) => mediaDevice.kind === 'videoinput')
 
-        getDeviceType()
-        if(cameraDevices.length === 0)
+        if (cameraDevices.length === 0)
             return Error;
 
+        if (accessDeviceType === deviceType.iOS) {
+            // camera index[1] 
+
+        } else if (accessDeviceType === deviceType.Android) {
+            // camera index[0]
+        } else if(accessDeviceType === deviceType.PC){
+            // camera index[0]
+        }
     }
 
     /**
@@ -36,10 +46,9 @@ export const CameraModule = () => {
 
         } catch(error) {
             console.error('[CameraModule_error]', error)
-
         }
         
     }
 
-    return {getUserDevice}
+    return { getUserDevice }
 }
