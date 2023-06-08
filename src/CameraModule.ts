@@ -1,10 +1,32 @@
-import { deviceType, getDeviceType } from "./Common"
+import { CameraResolution, deviceType, getDeviceType } from "./Common"
 
 /**
  * Camera Module
  * @returns getUserDevice()
  */
 export const CameraModule = () => {
+    /**
+     * Initialize video camera with device id and resoltuion
+     */
+    const intiVideoCamera = async (deviceId: string, resoltuion: CameraResolution) => {
+        try {
+            const [ width, height ]: number[] = resoltuion.split('x').map(Number)
+            return (
+                await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        width: { exact: width },
+                        height: { exact: height },
+                        aspectRatio: { exact: width / height },
+                        deviceId: deviceId
+                    }
+                })
+            )
+        } catch (error){
+            throw new Error(`Unable to setup camera device for the following reason: ${error}`)
+        }
+
+    }
 
     /**
      * Get device ID 
@@ -12,19 +34,20 @@ export const CameraModule = () => {
      * If is not mobile device, get first index camera ID
      */
     const getAvailableDeviceId = async() => {
-        const accessDeviceType = getDeviceType()
         const cameraDevices = (await navigator.mediaDevices.enumerateDevices()).filter((mediaDevice) => mediaDevice.kind === 'videoinput')
 
         if (cameraDevices.length === 0)
-            return Error;
+            return Error
 
-        if (accessDeviceType === deviceType.iOS) {
-            // camera index[1] 
-
-        } else if (accessDeviceType === deviceType.Android) {
-            // camera index[0]
-        } else if(accessDeviceType === deviceType.PC){
-            // camera index[0]
+        switch(getDeviceType()){
+            case deviceType.iOS:
+                return cameraDevices[1].deviceId
+            case deviceType.Android:
+                return cameraDevices[cameraDevices.length - 1].deviceId
+            case deviceType.PC:
+                return cameraDevices[0].deviceId
+            default:
+                throw Error
         }
     }
 
@@ -38,7 +61,8 @@ export const CameraModule = () => {
             await navigator.permissions.query(<PermissionDescriptor><unknown>{name : 'camera'}).then(((permissionStatus: PermissionStatus) => {
                 // permission status values are granted and prompt, denied
                 if(permissionStatus.state === 'granted' || permissionStatus.state === 'prompt') {
-                    getAvailableDeviceId()
+                    const availableCameraId =  getAvailableDeviceId()
+                    const mediaStream = intiVideoCamera(availableCameraId, resolution)
                 }
                 else
                     throw Error

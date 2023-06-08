@@ -3,8 +3,7 @@ import { useEffect } from "react"
 
 const Index = () => {
     useEffect(() => {
-        console.log('[index.tsx]', CameraModule().getUserDevice())
-
+        CameraModule().getUserDevice().then((result) => {console.log(result)})
     }, [])
     return(
         <>
